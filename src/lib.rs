@@ -18,3 +18,18 @@ pub fn establish_connection() -> PgConnection {
     PgConnection::establish(&database_url)
         .expect(&format!("Error connecting to {}", database_url))
 }
+
+use self::models::{Warehouse, NewWarehouse};
+
+pub fn create_warehouse<'a>(conn: &PgConnection, name: &'a str) -> Warehouse {
+    use schema::warehouses;
+
+    let new_warehouse = NewWarehouse {
+        scoped_id: 1,
+        name: name,
+    };
+
+    diesel::insert(&new_warehouse).into(warehouses::table)
+        .get_result(conn)
+        .expect("Error saving new warehouse")
+}
