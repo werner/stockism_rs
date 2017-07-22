@@ -1,6 +1,9 @@
+extern crate serde;
+extern crate serde_json;
+
 use super::schema::warehouses;
 
-#[derive(Queryable)]
+#[derive(Serialize, Deserialize, Queryable, Debug)]
 pub struct Warehouse {
     pub id: i32,
     pub scoped_id: i32,
