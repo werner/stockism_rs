@@ -11,7 +11,7 @@ use iron::{Request, Response, IronResult};
 use iron::mime::Mime;
 
 pub fn list_handler(req: &mut Request) -> IronResult<Response> {
-    let content_type = "application/json".parse::<Mime>().unwrap();
+    let content_type = "application/json; charset=utf-8".parse::<Mime>().unwrap();
     use stockism::schema::warehouses::dsl::*;
 
     let connection = establish_connection();
