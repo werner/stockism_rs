@@ -13,6 +13,6 @@ pub struct Warehouse {
 #[derive(Serialize, Deserialize, Insertable)]
 #[table_name="warehouses"]
 pub struct NewWarehouse<'a> {
-    pub scoped_id: i32,
+    pub scoped_id: Option<i32>,
     pub name: &'a str,
 }
