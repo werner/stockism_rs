@@ -2,15 +2,18 @@ extern crate stockism;
 extern crate diesel;
 extern crate serde_json;
 
+use std::io::Read;
+
 use self::stockism::*;
-use self::stockism::models::*;
 use self::diesel::prelude::*;
+
+use self::diesel::pg::PgConnection;
 
 use iron::status;
 use iron::{Request, Response, IronResult};
 use iron::mime::Mime;
 
-pub fn list_handler(req: &mut Request) -> IronResult<Response> {
+pub fn list(_req: &mut Request) -> IronResult<Response> {
     let content_type = "application/json; charset=utf-8".parse::<Mime>().unwrap();
     use stockism::schema::warehouses::dsl::*;
 
@@ -25,3 +28,36 @@ pub fn list_handler(req: &mut Request) -> IronResult<Response> {
     Ok(Response::with((content_type, status::Ok, warehouses_serialized)))
 }
 
+use self::models::{Warehouse, NewWarehouse};
+
+pub fn create(req: &mut Request) -> IronResult<Response> {
+    let content_type = "application/json; charset=utf-8".parse::<Mime>().unwrap();
+    let connection   = establish_connection();
+    let mut payload  = String::new();
+    req.body.read_to_string(&mut payload);
+    match serde_json::from_str(&payload) {
+        Ok(request) => {
+            let warehouse: NewWarehouse = request;
+            match create_warehouse(&connection, warehouse.name) {
+                Ok(_warehouse) => Ok(Response::with((content_type, status::Ok,
+                                                    "{'sucess': true}"))),
+                Err(error)    => Ok(Response::with((content_type, status::Ok,
+                                                    format!("{{'sucess': false, message: {} }}", error)))),
+            }
+        },
+        Err(p_error) => Ok(Response::with((content_type, status::Ok,
+                                           format!("{{'sucess': false, message: {} }}", p_error)))),
+    }
+
+}
+
+pub fn create_warehouse<'a>(conn: &PgConnection, name: &'a str) -> QueryResult<Warehouse> {
+    use self::schema::warehouses;
+
+    let new_warehouse = NewWarehouse {
+        scoped_id: 1,
+        name: name,
+    };
+
+    diesel::insert(&new_warehouse).into(warehouses::table).get_result(conn)
+}

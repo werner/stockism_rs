@@ -9,7 +9,6 @@ extern crate dotenv;
 pub mod schema;
 pub mod models;
 
-use diesel::prelude::*;
 use dotenv::dotenv;
 use std::env;
 use diesel::pg::PgConnection;
@@ -30,19 +29,4 @@ fn get_pool() -> DieselPool {
         .expect("DATABASE_URL must be set");
     let manager = ConnectionManager::<PgConnection>::new(database_url);
     r2d2::Pool::new(config, manager).expect("Failed to create pool")
-}
-
-use self::models::{Warehouse, NewWarehouse};
-
-pub fn create_warehouse<'a>(conn: &PgConnection, name: &'a str) -> Warehouse {
-    use schema::warehouses;
-
-    let new_warehouse = NewWarehouse {
-        scoped_id: 1,
-        name: name,
-    };
-
-    diesel::insert(&new_warehouse).into(warehouses::table)
-        .get_result(conn)
-        .expect("Error saving new warehouse")
 }
