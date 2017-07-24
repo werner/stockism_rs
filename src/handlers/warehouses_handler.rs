@@ -77,7 +77,7 @@ fn get_last_scoped_id() -> i32 {
         .expect("Error loading warehouses");
     let mut _scoped_id: i32 = 0;
     for warehouse in results {
-        _scoped_id = warehouse.scoped_id + 1;
+        _scoped_id = warehouse.scoped_id.unwrap_or(0) + 1;
     }
     if _scoped_id == 0 {
         1

@@ -6,7 +6,7 @@ use super::schema::warehouses;
 #[derive(Serialize, Deserialize, Queryable, Debug)]
 pub struct Warehouse {
     pub id: i32,
-    pub scoped_id: i32,
+    pub scoped_id: Option<i32>,
     pub name: String,
 }
 
