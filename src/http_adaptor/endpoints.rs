@@ -1,5 +1,4 @@
 use router::Router;
-use iron::prelude::Chain;
 
 use handlers::root_handler;
 use handlers::warehouses_handler;

@@ -10,8 +10,6 @@ use self::diesel::prelude::*;
 
 use self::diesel::pg::PgConnection;
 
-use iron::mime::Mime;
-use iron::status;
 use iron::{Request, Response, IronResult};
 
 use handlers::utils::*;

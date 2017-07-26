@@ -1,6 +1,3 @@
-use std::collections::HashSet;
-use std::env;
-
 use iron::prelude::*;
 use router::Router;
 use slog::Logger;

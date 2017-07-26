@@ -2,7 +2,6 @@ use iron::status;
 use iron::prelude::*;
 use serde::ser::Serialize;
 use serde_json;
-use iron::status::Status;
 
 use iron::mime::Mime;
 
