@@ -50,20 +50,19 @@ fn create_warehouse<'a>(conn: &PgConnection, name: &'a str) -> QueryResult<Wareh
     use self::schema::warehouses;
 
     let new_warehouse = NewWarehouse {
-        scoped_id: Some(get_last_scoped_id()),
+        scoped_id: Some(get_last_scoped_id(conn)),
         name: name,
     };
 
     diesel::insert(&new_warehouse).into(warehouses::table).get_result(conn)
 }
 
-fn get_last_scoped_id() -> i32 {
+fn get_last_scoped_id(conn: &PgConnection) -> i32 {
     use stockism::schema::warehouses::dsl::*;
-    let connection = establish_connection();
     let results = warehouses
         .limit(1)
         .order(scoped_id.desc())
-        .load::<Warehouse>(&*connection)
+        .load::<Warehouse>(&*conn)
         .expect("Error loading warehouses");
     let mut _scoped_id: i32 = 0;
     for warehouse in results {
