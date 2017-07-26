@@ -3,57 +3,49 @@ extern crate diesel;
 extern crate serde_json;
 
 use std::io::Read;
+use std::error::Error;
 
 use self::stockism::*;
 use self::diesel::prelude::*;
 
 use self::diesel::pg::PgConnection;
 
+use iron::mime::Mime;
 use iron::status;
 use iron::{Request, Response, IronResult};
-use iron::mime::Mime;
 
-pub fn list(_req: &mut Request) -> IronResult<Response> {
-    let content_type = "application/json; charset=utf-8".parse::<Mime>().unwrap();
+use handlers::utils::*;
+use middlewares::DieselReqExt;
+
+pub fn list(req: &mut Request) -> IronResult<Response> {
     use stockism::schema::warehouses::dsl::*;
 
-    let connection = establish_connection();
+    let connection = req.get_db_conn();
     let results = warehouses
         .limit(10)
         .load::<Warehouse>(&*connection)
         .expect("Error loading warehouses");
 
-    let warehouses_serialized = serde_json::to_string(&results).unwrap();
-
-    Ok(Response::with((content_type, status::Ok, warehouses_serialized)))
+    response_ok(&results)
 }
 
 use self::models::{Warehouse, NewWarehouse};
 
 pub fn create(req: &mut Request) -> IronResult<Response> {
-    let content_type = "application/json; charset=utf-8".parse::<Mime>().unwrap();
-    let connection   = establish_connection();
-    let mut payload  = String::new();
-    match req.body.read_to_string(&mut payload) {
-        Ok(_) => {
-            match serde_json::from_str(&payload) {
-                Ok(request) => {
-                    let warehouse: NewWarehouse = request;
-                    match create_warehouse(&connection, warehouse.name) {
-                        Ok(_warehouse) => Ok(Response::with((content_type, status::Ok,
-                                                             "{'sucess': true}"))),
-                        Err(error)    => Ok(Response::with((content_type, status::Ok,
-                                                            format!("{{'sucess': false, message: {} }}", error)))),
-                    }
-                },
-                Err(p_error) => Ok(Response::with((content_type, status::Ok,
-                                                   format!("{{'sucess': false, message: {} }}", p_error)))),
+    let connection = req.get_db_conn();
+    let body = get_body!(req, response_bad_request);
+
+    match serde_json::from_str::<NewWarehouse>(&body) {
+        Ok(new_warehouse) => {
+            match create_warehouse(&connection, &new_warehouse.name) {
+                Ok (_warehouse) => response_ok_success(),
+                Err(error)      => response_internal_server_error(error.to_string()),
             }
         },
-        Err(_) => Ok(Response::with((content_type, status::Ok,
-                                     "{{'sucess': false, message: error loading payload }}"))),
+        Err(error)        => response_bad_request(format!("{}: {}", error.description(), error))
     }
 
+    
 }
 
 fn create_warehouse<'a>(conn: &PgConnection, name: &'a str) -> QueryResult<Warehouse> {

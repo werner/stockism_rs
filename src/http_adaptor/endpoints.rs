@@ -1,5 +1,4 @@
 use router::Router;
-use mount::Mount;
 use iron::prelude::Chain;
 
 use handlers::root_handler;

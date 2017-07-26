@@ -2,11 +2,13 @@
 extern crate diesel_codegen;
 #[macro_use] 
 extern crate diesel;
+extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
+extern crate serde_json;
 extern crate stockism;
 extern crate iron;
-extern crate mount;
 #[macro_use]
 extern crate slog;
 extern crate slog_term;
