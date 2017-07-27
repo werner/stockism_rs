@@ -5,6 +5,18 @@ use super::schema::warehouses;
 use super::diesel::prelude::*;
 use super::diesel::pg::PgConnection;
 
+macro_rules! get_last_scoped_id {
+	($conn: ident, $table: ident, $struct: ident, $field: expr) => {
+        {
+            $table
+                .order($field)
+                .first::<$struct>(&*$conn)
+                .expect("Error loading records")
+                .scoped_id.unwrap_or(0) + 1
+        }
+	}
+}
+
 #[derive(Serialize, Deserialize, Queryable, Debug)]
 pub struct Warehouse {
     pub id: i32,
@@ -37,11 +49,7 @@ impl Warehouse {
 
     fn get_last_scoped_id(conn: &PgConnection) -> i32 {
         use schema::warehouses::dsl::*;
-        warehouses
-            .order(scoped_id.desc())
-            .first::<Warehouse>(&*conn)
-            .expect("Error loading warehouses")
-            .scoped_id.unwrap_or(0) + 1
+        get_last_scoped_id!(conn, warehouses, Warehouse, scoped_id.desc())
     }
 
 }
