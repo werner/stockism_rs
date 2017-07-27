@@ -8,8 +8,6 @@ use std::error::Error;
 use self::stockism::*;
 use self::diesel::prelude::*;
 
-use self::diesel::pg::PgConnection;
-
 use iron::{Request, Response, IronResult};
 
 use handlers::utils::*;
@@ -35,42 +33,11 @@ pub fn create(req: &mut Request) -> IronResult<Response> {
 
     match serde_json::from_str::<NewWarehouse>(&body) {
         Ok(new_warehouse) => {
-            match create_warehouse(&connection, &new_warehouse.name) {
+            match Warehouse::create(&connection, &new_warehouse) {
                 Ok (_warehouse) => response_ok_success(),
                 Err(error)      => response_internal_server_error(error.to_string()),
             }
         },
         Err(error)        => response_bad_request(format!("{}: {}", error.description(), error))
-    }
-
-    
-}
-
-fn create_warehouse<'a>(conn: &PgConnection, name: &'a str) -> QueryResult<Warehouse> {
-    use self::schema::warehouses;
-
-    let new_warehouse = NewWarehouse {
-        scoped_id: Some(get_last_scoped_id(conn)),
-        name: name,
-    };
-
-    diesel::insert(&new_warehouse).into(warehouses::table).get_result(conn)
-}
-
-fn get_last_scoped_id(conn: &PgConnection) -> i32 {
-    use stockism::schema::warehouses::dsl::*;
-    let results = warehouses
-        .limit(1)
-        .order(scoped_id.desc())
-        .load::<Warehouse>(&*conn)
-        .expect("Error loading warehouses");
-    let mut _scoped_id: i32 = 0;
-    for warehouse in results {
-        _scoped_id = warehouse.scoped_id.unwrap_or(0) + 1;
-    }
-    if _scoped_id == 0 {
-        1
-    } else {
-        _scoped_id
     }
 }
