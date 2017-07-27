@@ -37,20 +37,11 @@ impl Warehouse {
 
     fn get_last_scoped_id(conn: &PgConnection) -> i32 {
         use schema::warehouses::dsl::*;
-        let results = warehouses
-            .limit(1)
+        warehouses
             .order(scoped_id.desc())
-            .load::<Warehouse>(&*conn)
-            .expect("Error loading warehouses");
-        let mut _scoped_id: i32 = 0;
-        for warehouse in results {
-            _scoped_id = warehouse.scoped_id.unwrap_or(0) + 1;
-        }
-        if _scoped_id == 0 {
-            1
-        } else {
-            _scoped_id
-        }
+            .first::<Warehouse>(&*conn)
+            .expect("Error loading warehouses")
+            .scoped_id.unwrap_or(0) + 1
     }
 
 }
