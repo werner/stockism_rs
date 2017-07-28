@@ -5,18 +5,6 @@ use stockism::schema::warehouses;
 use self::diesel::prelude::*;
 use self::diesel::pg::PgConnection;
 
-macro_rules! get_last_scoped_id {
-	($conn: ident, $table: ident, $struct: ident, $field: expr) => {
-        {
-            $table
-                .order($field)
-                .first::<$struct>(&*$conn)
-                .expect("Error loading records")
-                .scoped_id.unwrap_or(0) + 1
-        }
-	}
-}
-
 #[derive(Serialize, Deserialize, Queryable, Debug)]
 pub struct Warehouse {
     pub id: i32,
