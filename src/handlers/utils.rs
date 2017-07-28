@@ -53,6 +53,19 @@ macro_rules! create_http_response {
 	};
 }
 
+macro_rules! get_body_as {
+	($structure:ty, $body:expr, $req:expr, $error_fn:ident) => {
+		{
+			let structure = serde_json::from_str::<$structure>($body);
+
+			match structure {
+				Ok(structure) => structure,
+				Err(error) => return $error_fn(format!("{}: {}", error.description(), error))
+			}
+		}
+	}
+}
+
 macro_rules! get_body {
 	($req:expr, $error_fn:ident) => {
         {

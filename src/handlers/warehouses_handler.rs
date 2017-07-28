@@ -19,6 +19,7 @@ pub fn list(req: &mut Request) -> IronResult<Response> {
     let connection = req.get_db_conn();
     let results = warehouses
         .limit(10)
+        .order(scoped_id.asc())
         .load::<Warehouse>(&*connection)
         .expect("Error loading warehouses");
 
@@ -29,31 +30,24 @@ pub fn create(req: &mut Request) -> IronResult<Response> {
     let connection = req.get_db_conn();
     let body = get_body!(req, response_bad_request);
 
-    match serde_json::from_str::<NewWarehouse>(&body) {
-        Ok(new_warehouse) => {
-            match Warehouse::create(&connection, &new_warehouse) {
-                Ok (_warehouse) => response_ok_success(),
-                Err(error)      => response_internal_server_error(error.to_string()),
-            }
-        },
-        Err(error)        => response_bad_request(format!("{}: {}", error.description(), error))
+    let new_warehouse = get_body_as!(NewWarehouse, &body, req, response_bad_request);
+
+    match Warehouse::create(&connection, &new_warehouse) {
+        Ok (_warehouse) => response_ok_success(),
+        Err(error)      => response_internal_server_error(error.to_string()),
     }
 }
 
 pub fn update(req: &mut Request) -> IronResult<Response> {
     let connection = req.get_db_conn();
-    let body = get_body!(req, response_bad_request);
-
 	let warehouse_id = get_route_parameter_as!(i32, req, "id", response_not_found("Warehouse not found"));
+    
+    let body = get_body!(req, response_bad_request);
+    let edit_warehouse = get_body_as!(EditWarehouse, &body, req, response_bad_request);
 
-    match serde_json::from_str::<EditWarehouse>(&body) {
-        Ok(edit_warehouse) => {
-            match Warehouse::update(&connection, warehouse_id, &edit_warehouse) {
-                Ok (_warehouse) => response_ok_success(),
-                Err(error)      => response_internal_server_error(error.to_string()),
-            }
-        },
-        Err(error)        => response_bad_request(format!("{}: {}", error.description(), error))
+    match Warehouse::update(&connection, warehouse_id, &edit_warehouse) {
+        Ok (_warehouse) => response_ok_success(),
+        Err(error)      => response_internal_server_error(error.to_string()),
     }
 
 }
