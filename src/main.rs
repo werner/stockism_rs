@@ -1,5 +1,10 @@
+#[macro_use]
 extern crate diesel;
+#[macro_use]
+extern crate diesel_codegen;
 extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 extern crate stockism;
@@ -18,6 +23,7 @@ mod handlers;
 mod http_adaptor;
 mod utils;
 mod middlewares;
+mod models;
 
 use http_adaptor::HttpAdaptor;
 use utils::logger_factory;

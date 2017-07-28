@@ -1,9 +1,9 @@
-extern crate serde;
-extern crate serde_json;
+extern crate stockism;
+extern crate diesel;
 
-use super::schema::warehouses;
-use super::diesel::prelude::*;
-use super::diesel::pg::PgConnection;
+use stockism::schema::warehouses;
+use self::diesel::prelude::*;
+use self::diesel::pg::PgConnection;
 
 macro_rules! get_last_scoped_id {
 	($conn: ident, $table: ident, $struct: ident, $field: expr) => {
@@ -34,7 +34,7 @@ pub struct NewWarehouse<'a> {
 impl Warehouse {
 
     pub fn create<'a>(conn: &PgConnection, new_warehouse: &'a NewWarehouse) -> QueryResult<Warehouse> {
-        use schema::warehouses;
+        use stockism::schema::warehouses;
         use diesel;
 
         let last_scoped_id = Warehouse::get_last_scoped_id(conn);
@@ -48,7 +48,7 @@ impl Warehouse {
     }
 
     fn get_last_scoped_id(conn: &PgConnection) -> i32 {
-        use schema::warehouses::dsl::*;
+        use stockism::schema::warehouses::dsl::*;
         get_last_scoped_id!(conn, warehouses, Warehouse, scoped_id.desc())
     }
 

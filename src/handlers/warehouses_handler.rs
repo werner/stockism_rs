@@ -5,13 +5,13 @@ extern crate serde_json;
 use std::io::Read;
 use std::error::Error;
 
-use self::stockism::*;
 use self::diesel::prelude::*;
 
 use iron::{Request, Response, IronResult};
 
 use handlers::utils::*;
 use middlewares::DieselReqExt;
+use models::{Warehouse, NewWarehouse};
 
 pub fn list(req: &mut Request) -> IronResult<Response> {
     use stockism::schema::warehouses::dsl::*;
@@ -24,8 +24,6 @@ pub fn list(req: &mut Request) -> IronResult<Response> {
 
     response_ok(&results)
 }
-
-use self::models::{Warehouse, NewWarehouse};
 
 pub fn create(req: &mut Request) -> IronResult<Response> {
     let connection = req.get_db_conn();
