@@ -67,6 +67,33 @@ macro_rules! get_body {
 	}
 }
 
+macro_rules! get_route_parameter_as {
+	($parse_type:ty, $req:expr, $param:expr, $return_http:expr) => {
+		{
+			let ref param = get_route_parameter!($req, $param, $return_http);
+
+			match param.parse::<$parse_type>() {
+				Ok(expr) => expr,
+				Err(_) => return $return_http
+			}
+		}
+	}
+}
+
+macro_rules! get_route_parameter {
+	($req:expr, $param:expr, $return_http:expr) => {
+		{
+            use router::Router;
+			let param = $req.extensions.get::<Router>().unwrap().find($param);
+
+			match param {
+				Some(expr) => expr,
+				None       => return $return_http
+			}
+		}
+	}
+}
+
 create_http_response!(response_ok, status::Ok, "to_json");
 create_http_response!(response_ok_text, status::Ok, "text");
 

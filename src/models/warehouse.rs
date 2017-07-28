@@ -19,6 +19,11 @@ pub struct NewWarehouse<'a> {
     pub name: &'a str,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct EditWarehouse {
+    pub name: String,
+}
+
 impl Warehouse {
 
     pub fn create<'a>(conn: &PgConnection, new_warehouse: &'a NewWarehouse) -> QueryResult<Warehouse> {
@@ -33,6 +38,17 @@ impl Warehouse {
         };
 
         diesel::insert(&new_warehouse).into(warehouses::table).get_result(conn)
+    }
+
+    pub fn update<'a>(conn: &PgConnection, id: i32, 
+                      warehouse: &'a EditWarehouse) -> QueryResult<Warehouse> {
+        use stockism::schema::warehouses::dsl::{warehouses, name};
+        use diesel;
+
+        diesel::update(warehouses.find(id))
+            .set(name.eq(warehouse.name.clone()))
+            .get_result(conn)
+
     }
 
     fn get_last_scoped_id(conn: &PgConnection) -> i32 {

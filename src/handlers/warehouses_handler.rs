@@ -11,7 +11,7 @@ use iron::{Request, Response, IronResult};
 
 use handlers::utils::*;
 use middlewares::DieselReqExt;
-use models::{Warehouse, NewWarehouse};
+use models::{Warehouse, NewWarehouse, EditWarehouse};
 
 pub fn list(req: &mut Request) -> IronResult<Response> {
     use stockism::schema::warehouses::dsl::*;
@@ -38,4 +38,22 @@ pub fn create(req: &mut Request) -> IronResult<Response> {
         },
         Err(error)        => response_bad_request(format!("{}: {}", error.description(), error))
     }
+}
+
+pub fn update(req: &mut Request) -> IronResult<Response> {
+    let connection = req.get_db_conn();
+    let body = get_body!(req, response_bad_request);
+
+	let warehouse_id = get_route_parameter_as!(i32, req, "id", response_not_found("Warehouse not found"));
+
+    match serde_json::from_str::<EditWarehouse>(&body) {
+        Ok(edit_warehouse) => {
+            match Warehouse::update(&connection, warehouse_id, &edit_warehouse) {
+                Ok (_warehouse) => response_ok_success(),
+                Err(error)      => response_internal_server_error(error.to_string()),
+            }
+        },
+        Err(error)        => response_bad_request(format!("{}: {}", error.description(), error))
+    }
+
 }
