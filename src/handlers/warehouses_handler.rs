@@ -51,3 +51,14 @@ pub fn update(req: &mut Request) -> IronResult<Response> {
     }
 
 }
+
+pub fn delete(req: &mut Request) -> IronResult<Response> {
+    let connection = req.get_db_conn();
+	let warehouse_id = get_route_parameter_as!(i32, req, "id", response_not_found("Warehouse not found"));
+    
+    match Warehouse::delete(&connection, warehouse_id) {
+        Ok (_warehouse) => response_ok_success(),
+        Err(error)      => response_internal_server_error(error.to_string()),
+    }
+
+}

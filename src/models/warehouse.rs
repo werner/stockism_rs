@@ -51,6 +51,13 @@ impl Warehouse {
 
     }
 
+    pub fn delete(conn: &PgConnection, id: i32) -> QueryResult<Warehouse> {
+        use stockism::schema::warehouses::dsl::warehouses;
+        use diesel;
+
+        diesel::delete(warehouses.find(id)).get_result(conn)
+    }
+
     fn get_last_scoped_id(conn: &PgConnection) -> i32 {
         use stockism::schema::warehouses::dsl::*;
         get_last_scoped_id!(conn, warehouses, Warehouse, scoped_id.desc())
