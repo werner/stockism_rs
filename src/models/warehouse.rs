@@ -26,6 +26,19 @@ pub struct EditWarehouse {
 
 impl Warehouse {
 
+    pub fn list(conn: &PgConnection) -> QueryResult<Vec<Warehouse>> {
+        use stockism::schema::warehouses::dsl::*;
+        warehouses
+            .limit(10)
+            .order(scoped_id.asc())
+            .load::<Warehouse>(&*conn)
+    }
+
+    pub fn edit(conn: &PgConnection, id: i32) -> QueryResult<Warehouse> {
+        use stockism::schema::warehouses::dsl::warehouses;
+        warehouses.find(id).first::<Warehouse>(&*conn)
+    }
+
     pub fn create<'a>(conn: &PgConnection, new_warehouse: &'a NewWarehouse) -> QueryResult<Warehouse> {
         use stockism::schema::warehouses;
         use diesel;

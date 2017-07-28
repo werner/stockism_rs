@@ -1,11 +1,8 @@
 extern crate stockism;
-extern crate diesel;
 extern crate serde_json;
 
 use std::io::Read;
 use std::error::Error;
-
-use self::diesel::prelude::*;
 
 use iron::{Request, Response, IronResult};
 
@@ -14,16 +11,22 @@ use middlewares::DieselReqExt;
 use models::{Warehouse, NewWarehouse, EditWarehouse};
 
 pub fn list(req: &mut Request) -> IronResult<Response> {
-    use stockism::schema::warehouses::dsl::*;
-
     let connection = req.get_db_conn();
-    let results = warehouses
-        .limit(10)
-        .order(scoped_id.asc())
-        .load::<Warehouse>(&*connection)
-        .expect("Error loading warehouses");
 
-    response_ok(&results)
+    match Warehouse::list(&connection) {
+        Ok (_warehouses) => response_ok(&_warehouses),
+        Err(error)      =>  response_internal_server_error(error.to_string()),
+    }
+}
+
+pub fn edit(req: &mut Request) -> IronResult<Response> {
+    let connection = req.get_db_conn();
+	let warehouse_id = get_route_parameter_as!(i32, req, "id", response_not_found("Warehouse not found"));
+
+    match Warehouse::edit(&connection, warehouse_id) {
+        Ok (_warehouse) => response_ok(&_warehouse),
+        Err(error)      => response_internal_server_error(error.to_string()),
+    }
 }
 
 pub fn create(req: &mut Request) -> IronResult<Response> {
