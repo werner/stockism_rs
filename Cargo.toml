@@ -16,6 +16,7 @@ r2d2-diesel = "^0.14.0"
 slog = "2"
 slog-term = "2"
 slog-json = "2"
+iron-cors = {git = "https://github.com/DavidBM/iron-cors-rs"}
 
 [dependencies.iron]
 version = "*"
