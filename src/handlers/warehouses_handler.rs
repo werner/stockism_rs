@@ -15,7 +15,7 @@ pub fn list(req: &mut Request) -> IronResult<Response> {
 
     match Warehouse::list(&connection) {
         Ok (_warehouses) => response_ok(&_warehouses),
-        Err(error)      =>  response_internal_server_error(error.to_string()),
+        Err(error)       =>  response_internal_server_error(error.to_string()),
     }
 }
 

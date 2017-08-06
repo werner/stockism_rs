@@ -3,7 +3,6 @@ use slog::*;
 use iron::{typemap, BeforeMiddleware};
 use iron::prelude::*;
 
-
 pub struct LoggerMiddleware {
 	pub logger: Logger
 }
