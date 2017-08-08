@@ -2,7 +2,6 @@
 CREATE TABLE warehouses (
     id SERIAL PRIMARY KEY,
     scoped_id INT,
-    name VARCHAR NOT NULL
+    name VARCHAR NOT NULL UNIQUE,
+    CHECK (name <> '')
 );
-
-CREATE UNIQUE INDEX warehouses_name_idx ON warehouses (name);

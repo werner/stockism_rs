@@ -1,11 +1,15 @@
 macro_rules! get_last_scoped_id {
 	($conn: ident, $table: ident, $struct: ident, $field: expr) => {
         {
-            $table
-                .order($field)
-                .first::<$struct>(&*$conn)
-                .expect("Error loading records")
-                .scoped_id.unwrap_or(0) + 1
+            let record = 
+                $table
+                    .order($field)
+                    .first::<$struct>(&*$conn);
+
+            if let Err(_) = record {
+                return 1
+            }
+            record.unwrap().scoped_id.unwrap()
         }
 	}
 }
