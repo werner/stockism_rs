@@ -9,7 +9,7 @@ macro_rules! get_last_scoped_id {
             if let Err(_) = record {
                 return 1
             }
-            record.unwrap().scoped_id.unwrap()
+            record.unwrap().scoped_id.unwrap() + 1
         }
 	}
 }
