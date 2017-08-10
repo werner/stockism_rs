@@ -113,7 +113,7 @@ macro_rules! get_params_argument {
             use params::Value;
 
             match $map.find($param) {
-                Some(&Value::$type(ref value)) => value,
+                Some(&Value::String(ref value)) => value.parse::<$type>().unwrap(),
                 _ => $default
             }
 		}

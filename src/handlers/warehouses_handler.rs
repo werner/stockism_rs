@@ -19,10 +19,10 @@ pub fn list(req: &mut Request) -> IronResult<Response> {
     let default_offset = 0;
     let map = req.get_ref::<Params>().unwrap();
 
-	let limit = get_params_argument!(map,  &["limit"],  I64, &default_limit);
-	let offset = get_params_argument!(map, &["offset"], I64, &default_offset);
+	let limit = get_params_argument!(map,  &["limit"],  i64, default_limit);
+	let offset = get_params_argument!(map, &["offset"], i64, default_offset);
 
-    match Warehouse::list(&connection, *limit, *offset) {
+    match Warehouse::list(&connection, limit, offset) {
         Ok (_warehouses) => response_ok(&_warehouses),
         Err(error)       =>  response_internal_server_error(error.to_string()),
     }
