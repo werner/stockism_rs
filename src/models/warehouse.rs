@@ -26,10 +26,11 @@ pub struct EditWarehouse {
 
 impl Warehouse {
 
-    pub fn list(conn: &PgConnection) -> QueryResult<Vec<Warehouse>> {
+    pub fn list(conn: &PgConnection, limit: i64, offset: i64) -> QueryResult<Vec<Warehouse>> {
         use stockism::schema::warehouses::dsl::*;
         warehouses
-            .limit(10)
+            .limit(limit)
+            .offset(offset)
             .order(scoped_id.asc())
             .load::<Warehouse>(&*conn)
     }

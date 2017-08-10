@@ -19,6 +19,7 @@ extern crate r2d2;
 extern crate r2d2_diesel;
 extern crate dotenv;
 extern crate iron_cors;
+extern crate params;
 
 mod handlers;
 mod http_adaptor;

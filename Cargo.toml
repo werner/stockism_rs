@@ -26,3 +26,6 @@ git = "https://github.com/iron/mount.git"
 
 [dependencies.bodyparser]
 git = "https://github.com/iron/body-parser.git"
+
+[dependencies.params]
+git = "https://github.com/iron/params.git"

@@ -4,6 +4,7 @@ extern crate serde_json;
 use std::io::Read;
 use std::error::Error;
 
+use iron::prelude::*;
 use iron::{Request, Response, IronResult};
 
 use handlers::utils::*;
@@ -11,9 +12,17 @@ use middlewares::DieselReqExt;
 use models::{Warehouse, NewWarehouse, EditWarehouse};
 
 pub fn list(req: &mut Request) -> IronResult<Response> {
+    use params::Params;
     let connection = req.get_db_conn();
 
-    match Warehouse::list(&connection) {
+    let default_limit  = 10;
+    let default_offset = 0;
+    let map = req.get_ref::<Params>().unwrap();
+
+	let limit = get_params_argument!(map,  &["limit"],  I64, &default_limit);
+	let offset = get_params_argument!(map, &["offset"], I64, &default_offset);
+
+    match Warehouse::list(&connection, *limit, *offset) {
         Ok (_warehouses) => response_ok(&_warehouses),
         Err(error)       =>  response_internal_server_error(error.to_string()),
     }
@@ -21,7 +30,7 @@ pub fn list(req: &mut Request) -> IronResult<Response> {
 
 pub fn edit(req: &mut Request) -> IronResult<Response> {
     let connection = req.get_db_conn();
-	let warehouse_id = get_route_parameter_as!(i32, req, "id", response_not_found("Warehouse not found"));
+	let warehouse_id = get_route_parameter_as!(i32, req, "id", response_not_found("You should provide an id"));
 
     match Warehouse::edit(&connection, warehouse_id) {
         Ok (_warehouse) => response_ok(&_warehouse),

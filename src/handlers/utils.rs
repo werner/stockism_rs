@@ -107,6 +107,19 @@ macro_rules! get_route_parameter {
 	}
 }
 
+macro_rules! get_params_argument {
+	($map:expr, $param:expr, $type:ident, $default:expr) => {
+		{
+            use params::Value;
+
+            match $map.find($param) {
+                Some(&Value::$type(ref value)) => value,
+                _ => $default
+            }
+		}
+	}
+}
+
 create_http_response!(response_ok, status::Ok, "to_json");
 create_http_response!(response_ok_text, status::Ok, "text");
 
