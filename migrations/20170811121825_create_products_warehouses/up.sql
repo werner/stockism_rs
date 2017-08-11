@@ -1,5 +1,6 @@
 -- Your SQL goes here
 CREATE TABLE products_warehouses(
+    id serial PRIMARY KEY,
     quantity DOUBLE PRECISION NOT NULL,
     product_id   INT REFERENCES products(id),
     warehouse_id INT REFERENCES warehouses(id)

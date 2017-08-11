@@ -13,7 +13,6 @@ extern crate iron;
 extern crate slog;
 extern crate slog_term;
 extern crate slog_json;
-#[macro_use]
 extern crate router;
 extern crate r2d2;
 extern crate r2d2_diesel;
